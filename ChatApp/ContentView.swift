@@ -8,14 +8,33 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject var messagesManager = MessageManager()
+    
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+            VStack {
+                TitleRow()
+                
+                ScrollViewReader { proxy in
+                    ScrollView{
+                        ForEach(messagesManager.messages, id:\.id){ message in
+                            MessageBubble(message: message)
+                        }
+                    }
+                    .padding(.top, 10)
+                    .background(.white)
+                    .cornerRadius(30, corners: [.topLeft, .topRight])
+                    .onChange(of: messagesManager.lastId) { id in
+                        proxy.scrollTo(id, anchor: .bottom)
+                    }
+                }
+                
+            }
+            .background(Color("Peach"))
+            
+            MessageField()
+                .environmentObject(messagesManager)
         }
-        .padding()
     }
 }
 
